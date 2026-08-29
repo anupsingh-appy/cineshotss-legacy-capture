@@ -138,7 +138,15 @@ export async function updateGalleryItem(
   input: GalleryInput,
   replacementFile?: File | null,
 ) {
-  const patch: Record<string, unknown> = { ...input };
+  const patch: {
+    title: string;
+    category: string;
+    description: string;
+    display_order: number;
+    is_published: boolean;
+    image_url?: string;
+    storage_path?: string;
+  } = { ...input };
   let oldPath: string | null = null;
 
   if (replacementFile) {
