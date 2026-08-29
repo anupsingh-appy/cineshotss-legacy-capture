@@ -24,15 +24,6 @@ export async function signOut() {
 }
 
 export async function isAdmin(userId: string) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
-  if (error) return false;
-  return data === true;
-}
-
-export async function getAdminRole(userId: string) {
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")
