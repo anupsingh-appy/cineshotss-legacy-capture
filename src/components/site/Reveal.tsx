@@ -9,7 +9,7 @@ interface RevealProps {
 
 /** Fades + lifts content into view once, on scroll. */
 export function Reveal({ children, className = "", delay = 0, as = "div" }: RevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -34,15 +34,14 @@ export function Reveal({ children, className = "", delay = 0, as = "div" }: Reve
     return () => observer.disconnect();
   }, []);
 
-  const Tag = as as "div";
-
   return (
-    <Tag
-      ref={ref as React.RefObject<HTMLDivElement>}
+    <div
+      ref={ref}
       className={`${shown ? "reveal-shown" : "reveal-hidden"} ${className}`}
       style={shown && delay ? { transitionDelay: `${delay}ms` } : undefined}
+      data-reveal-as={as}
     >
       {children}
-    </Tag>
+    </div>
   );
 }

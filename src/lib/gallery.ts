@@ -47,9 +47,10 @@ export async function withDisplayUrls(items: GalleryItem[]): Promise<GalleryPhot
 
   const signed = new Map<string, string>();
   if (paths.length > 0) {
-    const { data } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from(GALLERY_BUCKET)
       .createSignedUrls(paths, SIGNED_URL_TTL);
+    if (error) throw error;
     data?.forEach((entry, index) => {
       const path = paths[index];
       if (path && entry.signedUrl) signed.set(path, entry.signedUrl);
@@ -137,7 +138,15 @@ export async function updateGalleryItem(
   input: GalleryInput,
   replacementFile?: File | null,
 ) {
-  const patch: Record<string, unknown> = { ...input };
+  const patch: {
+    title: string;
+    category: string;
+    description: string;
+    display_order: number;
+    is_published: boolean;
+    image_url?: string;
+    storage_path?: string;
+  } = { ...input };
   let oldPath: string | null = null;
 
   if (replacementFile) {

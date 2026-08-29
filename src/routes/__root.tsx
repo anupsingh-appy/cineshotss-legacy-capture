@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -48,7 +49,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <button
+          <Button
+            type="button"
             onClick={() => {
               router.invalidate();
               reset();
@@ -56,7 +58,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             className="btn-solid-lux"
           >
             Try again
-          </button>
+          </Button>
           <a href="/" className="btn-outline-lux text-foreground">
             Go home
           </a>

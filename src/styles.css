@@ -251,6 +251,21 @@
   }
 }
 
+@utility form-input-lux {
+  min-height: 3.125rem;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: var(--color-foreground);
+  }
+}
+
 /* Slow cinematic image zoom on hover (desktop pointer only) */
 @utility img-cinematic {
   transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);

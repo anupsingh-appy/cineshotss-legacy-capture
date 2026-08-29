@@ -24,12 +24,14 @@ export async function signOut() {
 }
 
 export async function isAdmin(userId: string) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
   if (error) return false;
-  return data === true;
+  return data?.role === "admin";
 }
 
 export interface AuthState {
