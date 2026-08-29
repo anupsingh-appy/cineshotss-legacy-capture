@@ -34,11 +34,11 @@ export function Reveal({ children, className = "", delay = 0, as = "div" }: Reve
     return () => observer.disconnect();
   }, []);
 
-  const Tag = as as "div";
+  const Tag = as;
 
   return (
     <Tag
-      ref={ref as React.RefObject<HTMLDivElement>}
+      ref={ref}
       className={`${shown ? "reveal-shown" : "reveal-hidden"} ${className}`}
       style={shown && delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
