@@ -14,6 +14,7 @@ import {
   type CategorySlug,
   type GalleryInput,
   type GalleryItem,
+  type GalleryPhoto,
 } from "@/lib/gallery";
 import { signOut, useAuth } from "@/lib/auth";
 
@@ -34,7 +35,7 @@ const emptyForm: FormValues = {
 function AdminDashboardPage() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [items, setItems] = useState<GalleryItem[]>([]);
+  const [items, setItems] = useState<GalleryPhoto[]>([]);
   const [values, setValues] = useState<Record<string, FormValues>>({});
   const [replacementFiles, setReplacementFiles] = useState<Record<string, File | null>>({});
   const [newForm, setNewForm] = useState<FormValues>(emptyForm);
