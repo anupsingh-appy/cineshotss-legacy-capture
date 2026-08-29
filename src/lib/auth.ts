@@ -32,6 +32,17 @@ export async function isAdmin(userId: string) {
   return data === true;
 }
 
+export async function getAdminRole(userId: string) {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (error) return false;
+  return data?.role === "admin";
+}
+
 export interface AuthState {
   loading: boolean;
   session: Session | null;
