@@ -9,16 +9,6 @@ export async function signInWithPassword(email: string, password: string) {
   if (error) throw error;
 }
 
-export async function signUpWithPassword(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${window.location.origin}/admin` },
-  });
-  if (error) throw error;
-  return { needsConfirmation: data.session === null };
-}
-
 export async function signOut() {
   await supabase.auth.signOut();
 }

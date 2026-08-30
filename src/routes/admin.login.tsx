@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
-import { signInWithPassword, signUpWithPassword, useAuth } from "@/lib/auth";
+import { signInWithPassword, useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
@@ -23,11 +23,9 @@ export const Route = createFileRoute("/admin/login")({
 function AdminLoginPage() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [confirmationSent, setConfirmationSent] = useState(false);
 
   useEffect(() => {
     if (!auth.loading && auth.admin) {
@@ -38,23 +36,11 @@ function AdminLoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
-    setConfirmationSent(false);
 
     try {
-      if (mode === "signin") {
-        await signInWithPassword(email.trim(), password);
-        toast.success("Signed in");
-        await navigate({ to: "/admin" });
-      } else {
-        const result = await signUpWithPassword(email.trim(), password);
-        if (result.needsConfirmation) {
-          setConfirmationSent(true);
-          toast.success("Check your email to confirm your account");
-        } else {
-          toast.success("Account created");
-          await navigate({ to: "/admin" });
-        }
-      }
+      await signInWithPassword(email.trim(), password);
+      toast.success("Signed in");
+      await navigate({ to: "/admin" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to complete that request");
     } finally {
@@ -85,12 +71,10 @@ function AdminLoginPage() {
               ← Back to {BRAND.name}
             </Link>
             <h2 className="display-md mt-8">
-              {mode === "signin" ? "Welcome back" : "Create access"}
+              Welcome back
             </h2>
             <p className="body-editorial mt-4">
-              {mode === "signin"
-                ? "Enter your studio credentials to continue."
-                : "The first studio account is assigned administrator access."}
+              Enter your studio credentials to continue.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-10 space-y-5">
@@ -111,35 +95,17 @@ function AdminLoginPage() {
                   required
                   minLength={6}
                   type="password"
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="form-input-lux"
                 />
               </label>
 
-              {confirmationSent && (
-                <p className="border border-border px-4 py-3 text-sm text-muted-foreground">
-                  A confirmation link is on its way. Confirm your email, then return here to sign
-                  in.
-                </p>
-              )}
-
               <Button type="submit" disabled={busy} className="btn-solid-lux h-auto w-full rounded-none">
-                {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+                {busy ? "Signing in…" : "Sign in"}
               </Button>
             </form>
-
-            <button
-              type="button"
-              className="mt-8 text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => {
-                setMode((current) => (current === "signin" ? "signup" : "signin"));
-                setConfirmationSent(false);
-              }}
-            >
-              {mode === "signin" ? "Create the first studio account" : "Already have access? Sign in"}
-            </button>
           </div>
         </div>
       </div>
