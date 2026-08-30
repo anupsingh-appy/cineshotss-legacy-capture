@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import { supabase } from "@/integrations/supabase/client";
 import { signInWithPassword, useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/login")({
