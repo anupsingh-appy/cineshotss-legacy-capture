@@ -1,8 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import { supabase } from "@/integrations/supabase/client";
 import {
   CATEGORIES,
   categoryLabel,
@@ -17,9 +18,16 @@ import {
   type GalleryItem,
   type GalleryPhoto,
 } from "@/lib/gallery";
-import { signOut, useAuth } from "@/lib/auth";
+import { isAdmin, signOut, useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user || !(await isAdmin(data.user.id))) {
+      throw redirect({ to: "/admin/login" });
+    }
+  },
   component: AdminDashboardPage,
 });
 
