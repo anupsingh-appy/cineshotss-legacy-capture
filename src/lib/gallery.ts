@@ -35,6 +35,18 @@ export interface GalleryPhoto extends GalleryItem {
 }
 
 const SIGNED_URL_TTL = 60 * 60; // 1 hour
+export const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+export const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
+
+export function validateGalleryFile(file: File): string | null {
+  if (!SUPPORTED_IMAGE_TYPES.includes(file.type as (typeof SUPPORTED_IMAGE_TYPES)[number])) {
+    return "Please choose a JPG, JPEG, PNG or WEBP image.";
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    return "Images must be 25 MB or smaller.";
+  }
+  return null;
+}
 
 /**
  * Resolves display URLs for a batch of items. Storage-backed items get a
@@ -100,6 +112,8 @@ const publicUrlFor = (path: string) =>
   supabase.storage.from(GALLERY_BUCKET).getPublicUrl(path).data.publicUrl;
 
 export async function uploadGalleryFile(file: File, category: string) {
+  const validationError = validateGalleryFile(file);
+  if (validationError) throw new Error(validationError);
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${category}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage
