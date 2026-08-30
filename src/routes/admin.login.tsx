@@ -24,9 +24,11 @@ export const Route = createFileRoute("/admin/login")({
 function AdminLoginPage() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"signin" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     if (!auth.loading && auth.admin) {
@@ -44,6 +46,23 @@ function AdminLoginPage() {
       await navigate({ to: "/admin" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to complete that request");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResetRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setResetSent(true);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to send reset email");
     } finally {
       setBusy(false);
     }
