@@ -1,6 +1,8 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { KeyRound, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +20,7 @@ import {
   type GalleryItem,
   type GalleryPhoto,
 } from "@/lib/gallery";
-import { isAdmin, signOut, useAuth } from "@/lib/auth";
+import { isAdmin, reauthenticateWithPassword, signOut, useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/")({
   ssr: false,
@@ -41,6 +43,20 @@ const emptyForm: FormValues = {
   is_published: true,
 };
 
+const emailChangeSchema = z.object({
+  currentPassword: z.string().min(1, "Enter your current password."),
+  newEmail: z.string().trim().email("Enter a valid email address.").max(255, "Email address is too long."),
+});
+
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, "Enter your current password."),
+  newPassword: z.string().min(8, "Your new password must be at least 8 characters."),
+  confirmPassword: z.string().min(1, "Confirm your new password."),
+}).refine((values) => values.newPassword === values.confirmPassword, {
+  message: "New passwords do not match.",
+  path: ["confirmPassword"],
+});
+
 function AdminDashboardPage() {
   const auth = useAuth();
   const navigate = useNavigate();
@@ -56,6 +72,9 @@ function AdminDashboardPage() {
   const [uploadStatus, setUploadStatus] = useState("");
   const [filterCategory, setFilterCategory] = useState<"all" | CategorySlug>("all");
   const [search, setSearch] = useState("");
+  const [emailForm, setEmailForm] = useState({ currentPassword: "", newEmail: "" });
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [accountBusy, setAccountBusy] = useState<"email" | "password" | null>(null);
 
   const stats = useMemo(() => ({
     total: items.length,
@@ -218,6 +237,60 @@ function AdminDashboardPage() {
     await navigate({ to: "/admin/login", replace: true });
   }
 
+  async function handleEmailChange(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const result = emailChangeSchema.safeParse(emailForm);
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message ?? "Check the email form.");
+      return;
+    }
+    if (result.data.newEmail.toLowerCase() === auth.user?.email?.toLowerCase()) {
+      toast.error("Enter an email address different from your current one.");
+      return;
+    }
+
+    setAccountBusy("email");
+    try {
+      await reauthenticateWithPassword(result.data.currentPassword);
+      const { error } = await supabase.auth.updateUser(
+        { email: result.data.newEmail },
+        { emailRedirectTo: `${window.location.origin}/admin` },
+      );
+      if (error) throw error;
+      setEmailForm({ currentPassword: "", newEmail: "" });
+      toast.success("Check your inbox to confirm the new email address.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update your email address.");
+    } finally {
+      setAccountBusy(null);
+    }
+  }
+
+  async function handlePasswordChange(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const result = passwordChangeSchema.safeParse(passwordForm);
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message ?? "Check the password form.");
+      return;
+    }
+
+    setAccountBusy("password");
+    try {
+      await reauthenticateWithPassword(result.data.currentPassword);
+      const { error } = await supabase.auth.updateUser({
+        password: result.data.newPassword,
+        current_password: result.data.currentPassword,
+      });
+      if (error) throw error;
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      toast.success("Password updated securely.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update your password.");
+    } finally {
+      setAccountBusy(null);
+    }
+  }
+
   if (auth.loading || !auth.user || !auth.admin) {
     return <div className="flex min-h-screen items-center justify-center bg-ivory"><p className="eyebrow">Checking access…</p></div>;
   }
@@ -234,6 +307,9 @@ function AdminDashboardPage() {
             <Link to="/" className="hidden text-xs uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground sm:inline">
               View site
             </Link>
+            <Button asChild type="button" variant="outline" className="rounded-none">
+              <a href="#account-settings">Account settings</a>
+            </Button>
             <Button type="button" variant="outline" onClick={() => void handleSignOut()}>
               Sign out
             </Button>
@@ -269,6 +345,112 @@ function AdminDashboardPage() {
             ))}
           </div>
         </div>
+
+        <section id="account-settings" className="scroll-mt-8 border-b border-border py-12" aria-labelledby="account-settings-heading">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Account settings</p>
+            <h2 id="account-settings-heading" className="display-md mt-4">Keep access in your hands.</h2>
+            <p className="body-editorial mt-4 max-w-xl">
+              Manage the sign-in details for this private studio account. Every sensitive change starts with your current password.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <form onSubmit={handleEmailChange} className="border border-border bg-background p-6 md:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <Mail className="size-5" aria-hidden="true" />
+                  <h3 className="mt-5 font-display text-2xl">Email address</h3>
+                </div>
+                <ShieldCheck className="size-5 text-muted-foreground" aria-hidden="true" />
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">Current sign-in: {auth.user?.email ?? "Unavailable"}</p>
+              {auth.user?.new_email && (
+                <p className="mt-3 border border-accent bg-accent/20 p-3 text-sm" role="status">
+                  Confirmation pending for {auth.user.new_email}.
+                </p>
+              )}
+              <div className="mt-7 space-y-5">
+                <label className="block">
+                  <span className="eyebrow mb-2 block text-muted-foreground">New email</span>
+                  <input
+                    required
+                    type="email"
+                    autoComplete="email"
+                    value={emailForm.newEmail}
+                    onChange={(event) => setEmailForm((current) => ({ ...current, newEmail: event.target.value }))}
+                    className="form-input-lux"
+                  />
+                </label>
+                <label className="block">
+                  <span className="eyebrow mb-2 block text-muted-foreground">Current password</span>
+                  <input
+                    required
+                    type="password"
+                    autoComplete="current-password"
+                    value={emailForm.currentPassword}
+                    onChange={(event) => setEmailForm((current) => ({ ...current, currentPassword: event.target.value }))}
+                    className="form-input-lux"
+                  />
+                </label>
+                <Button type="submit" disabled={accountBusy !== null} className="btn-solid-lux h-auto rounded-none">
+                  {accountBusy === "email" ? "Updating…" : "Update email"}
+                </Button>
+              </div>
+            </form>
+
+            <form onSubmit={handlePasswordChange} className="border border-border bg-background p-6 md:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <KeyRound className="size-5" aria-hidden="true" />
+                  <h3 className="mt-5 font-display text-2xl">Password</h3>
+                </div>
+                <ShieldCheck className="size-5 text-muted-foreground" aria-hidden="true" />
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">Use a unique password of at least 8 characters.</p>
+              <div className="mt-7 space-y-5">
+                <label className="block">
+                  <span className="eyebrow mb-2 block text-muted-foreground">Current password</span>
+                  <input
+                    required
+                    type="password"
+                    autoComplete="current-password"
+                    value={passwordForm.currentPassword}
+                    onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
+                    className="form-input-lux"
+                  />
+                </label>
+                <label className="block">
+                  <span className="eyebrow mb-2 block text-muted-foreground">New password</span>
+                  <input
+                    required
+                    minLength={8}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.newPassword}
+                    onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
+                    className="form-input-lux"
+                  />
+                </label>
+                <label className="block">
+                  <span className="eyebrow mb-2 block text-muted-foreground">Confirm new password</span>
+                  <input
+                    required
+                    minLength={8}
+                    type="password"
+                    autoComplete="new-password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(event) => setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))}
+                    className="form-input-lux"
+                  />
+                </label>
+                <Button type="submit" disabled={accountBusy !== null} className="btn-solid-lux h-auto rounded-none">
+                  {accountBusy === "password" ? "Updating…" : "Update password"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </section>
 
         <section className="border-b border-border py-12" aria-labelledby="upload-heading">
           <div className="max-w-2xl">

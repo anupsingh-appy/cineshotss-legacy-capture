@@ -9,6 +9,20 @@ export async function signInWithPassword(email: string, password: string) {
   if (error) throw error;
 }
 
+/** Re-authenticate the current account before allowing a sensitive change. */
+export async function reauthenticateWithPassword(password: string) {
+  const { data, error: userError } = await supabase.auth.getUser();
+  if (userError || !data.user?.email) {
+    throw new Error("Your session has expired. Please sign in again.");
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: data.user.email,
+    password,
+  });
+  if (error) throw new Error("Current password is incorrect.");
+}
+
 export async function signOut() {
   await supabase.auth.signOut();
 }
