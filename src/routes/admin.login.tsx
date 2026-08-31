@@ -90,42 +90,102 @@ function AdminLoginPage() {
             <Link to="/" className="eyebrow text-muted-foreground">
               ← Back to {BRAND.name}
             </Link>
-            <h2 className="display-md mt-8">
-              Welcome back
-            </h2>
-            <p className="body-editorial mt-4">
-              Enter your studio credentials to continue.
-            </p>
+            {mode === "signin" ? (
+              <>
+                <h2 className="display-md mt-8">Welcome back</h2>
+                <p className="body-editorial mt-4">Enter your studio credentials to continue.</p>
 
-            <form onSubmit={handleSubmit} className="mt-10 space-y-5">
-              <label className="block">
-                <span className="eyebrow mb-2 block text-muted-foreground">Email</span>
-                <input
-                  required
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="form-input-lux"
-                />
-              </label>
-              <label className="block">
-                <span className="eyebrow mb-2 block text-muted-foreground">Password</span>
-                <input
-                  required
-                  minLength={6}
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="form-input-lux"
-                />
-              </label>
+                <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+                  <label className="block">
+                    <span className="eyebrow mb-2 block text-muted-foreground">Email</span>
+                    <input
+                      required
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="form-input-lux"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="eyebrow mb-2 block text-muted-foreground">Password</span>
+                    <input
+                      required
+                      minLength={6}
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="form-input-lux"
+                    />
+                  </label>
 
-              <Button type="submit" disabled={busy} className="btn-solid-lux h-auto w-full rounded-none">
-                {busy ? "Signing in…" : "Sign in"}
-              </Button>
-            </form>
+                  <Button type="submit" disabled={busy} className="btn-solid-lux h-auto w-full rounded-none">
+                    {busy ? "Signing in…" : "Sign in"}
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("forgot");
+                      setResetSent(false);
+                    }}
+                    className="eyebrow block text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <h2 className="display-md mt-8">Reset your password</h2>
+                <p className="body-editorial mt-4">
+                  Enter your admin email and we'll send you a secure link to set a new password.
+                </p>
+
+                {resetSent ? (
+                  <div className="mt-10 space-y-6">
+                    <p className="body-editorial border border-foreground/15 p-5">
+                      If an account exists for that email, a reset link has been sent. Please check your
+                      inbox — the link expires shortly.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setMode("signin")}
+                      className="eyebrow text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline"
+                    >
+                      ← Back to sign in
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleResetRequest} className="mt-10 space-y-5">
+                    <label className="block">
+                      <span className="eyebrow mb-2 block text-muted-foreground">Email</span>
+                      <input
+                        required
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        className="form-input-lux"
+                      />
+                    </label>
+
+                    <Button type="submit" disabled={busy} className="btn-solid-lux h-auto w-full rounded-none">
+                      {busy ? "Sending…" : "Send reset link"}
+                    </Button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMode("signin")}
+                      className="eyebrow block text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline"
+                    >
+                      ← Back to sign in
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
