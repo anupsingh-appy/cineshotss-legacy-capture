@@ -1,26 +1,19 @@
-# Plan: Backend Connection Verification (no changes)
+# Password Reset Email Diagnosis
 
-## Verification result
+No application or backend changes will be made.
 
-**No — this app is NOT connected to project `oxjvanlmbyzaqmqdwmab`.**
+## Findings
 
-The app is connected to Lovable Cloud's managed backend, which is a **different project**. All three pieces you asked about belong to that same connected project:
+- The reset request reached the connected Lovable Cloud Auth backend: two `/recover` requests returned HTTP 200, including requests referred from the reset-password flow.
+- The reset request was entered for `anup2952@gmail.com`.
+- No managed email delivery event is visible for that recipient in the current seven-day retention window. This means there is no logged sent, rejected, bounced, suppressed, or rate-limited event to confirm delivery.
+- Lovable Cloud is healthy and responding normally.
+- No custom email domain is configured. Auth emails can fall back to the default sender, but the project has no configured branded sender domain for managed email delivery.
 
-- **Admin Auth (users, roles, sessions)** — same connected project
-- **`gallery` database table** (with RLS policies) — same connected project
-- **`gallery` Storage bucket** (private, signed URLs) — same connected project
+## Diagnosis
 
-So everything currently in use is consistent — it all lives in one project — but it is not the project ID you named.
+The form submission is working, but the available delivery logs do not show a successful send or a delivery failure for this request. The clearest configuration issue is that the project has not configured an owned email domain; inbox delivery therefore cannot be confirmed from the managed email event history.
 
-## What this means
+## Next step, only if requested
 
-- On Lovable Cloud you don't connect your own Supabase project; Lovable provisions and manages one for you, and there is no Supabase dashboard to access.
-- Your admin account, gallery records, and uploaded images created through this app all exist in the Lovable-managed project, and the site works fully against it.
-
-## Options (if you want a change)
-
-1. **Keep the current backend (recommended):** everything already works end-to-end — auth, CMS, galleries, storage. Nothing to do.
-2. **Migrate data:** if you have data in another project you want here, I can help you recreate/export it into the connected backend.
-3. Switching this app to a personally-owned Supabase project is not supported on Lovable Cloud for this project.
-
-No code, database, auth, or storage changes are proposed.
+Review the default auth-email sending status or set up an owned sender domain, then repeat one reset request and inspect its delivery event. No changes are included in this diagnosis.
