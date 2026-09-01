@@ -17,7 +17,7 @@ export const getInitialAdminSetupStatus = createServerFn({ method: "GET" }).hand
 
   if (error) throw new Error("Unable to check initial admin setup.");
 
-  return { available: data.users.length === 0 };
+  return { available: data.users.length === 0, adminEmail: getConfiguredAdminEmail() };
 });
 
 export const createInitialAdmin = createServerFn({ method: "POST" })

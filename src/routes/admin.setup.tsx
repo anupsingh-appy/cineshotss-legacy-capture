@@ -24,6 +24,7 @@ function InitialAdminSetupPage() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [available, setAvailable] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,7 +33,10 @@ function InitialAdminSetupPage() {
     let active = true;
     getInitialAdminSetupStatus()
       .then((status) => {
-        if (active) setAvailable(status.available);
+        if (active) {
+          setAvailable(status.available);
+          setAdminEmail(status.adminEmail);
+        }
       })
       .catch(() => {
         if (active) setAvailable(false);
@@ -104,6 +108,9 @@ function InitialAdminSetupPage() {
                 <h2 className="display-md mt-8">Set your password</h2>
                 <p className="body-editorial mt-4">
                   Choose a strong password of at least 8 characters for the private admin account.
+                </p>
+                <p className="mt-5 border border-border bg-background p-4 text-sm">
+                  Admin email: <strong>{adminEmail}</strong>
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-10 space-y-5">
