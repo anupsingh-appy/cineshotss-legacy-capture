@@ -32,12 +32,12 @@ function ResetPasswordPage() {
     // The recovery link carries `type=recovery` in the URL hash; the Supabase
     // client exchanges it for a session and emits PASSWORD_RECOVERY.
     const hash = window.location.hash;
-    const isRecoveryLink = hash.includes("type=recovery");
+    const isPasswordSetupLink = hash.includes("type=recovery") || hash.includes("type=invite");
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && isPasswordSetupLink)) {
         setValid(true);
         setChecking(false);
       }
@@ -45,7 +45,7 @@ function ResetPasswordPage() {
 
     supabase.auth.getSession().then(({ data }) => {
       // A session may already exist from the hash exchange.
-      if (data.session && isRecoveryLink) {
+      if (data.session && isPasswordSetupLink) {
         setValid(true);
       }
       setChecking(false);
