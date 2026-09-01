@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/admin/setup")({
 });
 
 function InitialAdminSetupPage() {
-  const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [available, setAvailable] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
