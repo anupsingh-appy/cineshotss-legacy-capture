@@ -3,7 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
-import { createInitialAdmin, getInitialAdminSetupStatus } from "@/lib/admin-setup.functions";
+import { getInitialAdminSetupStatus, sendInitialAdminInvite } from "@/lib/admin-setup.functions";
 
 export const Route = createFileRoute("/admin/setup")({
   head: () => ({
@@ -25,8 +25,6 @@ function InitialAdminSetupPage() {
   const [checking, setChecking] = useState(true);
   const [available, setAvailable] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -52,24 +50,17 @@ function InitialAdminSetupPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-
     setBusy(true);
     try {
-      const result = await createInitialAdmin({ data: { password } });
+      const result = await sendInitialAdminInvite();
       if (!result.created) {
         setAvailable(false);
         toast.error("Initial admin setup is already closed.");
         return;
       }
 
-      setPassword("");
-      setConfirmPassword("");
-      toast.success("Admin account created securely.");
-      await navigate({ to: "/admin/login", replace: true });
+      setAvailable(false);
+      toast.success("A secure setup link was sent to the admin email.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to create the admin account.");
     } finally {
@@ -105,44 +96,18 @@ function InitialAdminSetupPage() {
               <p className="body-editorial mt-10">Checking setup availability…</p>
             ) : available ? (
               <>
-                <h2 className="display-md mt-8">Set your password</h2>
+                <h2 className="display-md mt-8">Secure account setup</h2>
                 <p className="body-editorial mt-4">
-                  Choose a strong password of at least 8 characters for the private admin account.
+                  We’ll send a one-time setup link to the designated admin email. Use that link to choose your
+                  password without sharing it with this website or anyone else.
                 </p>
                 <p className="mt-5 border border-border bg-background p-4 text-sm">
                   Admin email: <strong>{adminEmail}</strong>
                 </p>
 
-                <form onSubmit={handleSubmit} className="mt-10 space-y-5">
-                  <label className="block">
-                    <span className="eyebrow mb-2 block text-muted-foreground">Password</span>
-                    <input
-                      required
-                      minLength={8}
-                      maxLength={128}
-                      type="password"
-                      autoComplete="new-password"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      className="form-input-lux"
-                    />
-                  </label>
-                  <label className="block">
-                    <span className="eyebrow mb-2 block text-muted-foreground">Confirm password</span>
-                    <input
-                      required
-                      minLength={8}
-                      maxLength={128}
-                      type="password"
-                      autoComplete="new-password"
-                      value={confirmPassword}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="form-input-lux"
-                    />
-                  </label>
-
+                <form onSubmit={handleSubmit} className="mt-10">
                   <Button type="submit" disabled={busy} className="btn-solid-lux h-auto w-full rounded-none">
-                    {busy ? "Creating account…" : "Create admin account"}
+                    {busy ? "Sending secure link…" : "Send secure setup link"}
                   </Button>
                 </form>
               </>

@@ -1,9 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-
-const initialPasswordSchema = z.object({
-  password: z.string().min(8, "Your password must be at least 8 characters.").max(128, "Your password is too long."),
-});
+import { getRequestUrl } from "@tanstack/react-start/server";
 
 function getConfiguredAdminEmail() {
   const email = process.env["ADMIN_EMAIL"]?.trim().toLowerCase();
@@ -20,9 +16,7 @@ export const getInitialAdminSetupStatus = createServerFn({ method: "GET" }).hand
   return { available: data.users.length === 0, adminEmail: getConfiguredAdminEmail() };
 });
 
-export const createInitialAdmin = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => initialPasswordSchema.parse(data))
-  .handler(async ({ data }) => {
+export const sendInitialAdminInvite = createServerFn({ method: "POST" }).handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const adminEmail = getConfiguredAdminEmail();
     const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1 });
@@ -32,13 +26,11 @@ export const createInitialAdmin = createServerFn({ method: "POST" })
       return { created: false, reason: "closed" as const };
     }
 
-    const { data: createdUser, error } = await supabaseAdmin.auth.admin.createUser({
-      email: adminEmail,
-      password: data.password,
-      email_confirm: true,
+    const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(adminEmail, {
+      redirectTo: `${getRequestUrl().origin}/reset-password`,
     });
 
-    if (error || !createdUser.user) {
+    if (error) {
       if (error?.message.toLowerCase().includes("already been registered")) {
         return { created: false, reason: "closed" as const };
       }
