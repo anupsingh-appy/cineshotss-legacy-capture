@@ -1,19 +1,17 @@
-# Password Reset Email Diagnosis
+# Cineshotss website CMS upgrade
 
-No application or backend changes will be made.
+## Outcome
+Make the existing public Cineshotss website editable from `/admin` without changing its visual design or enabling public signup.
 
-## Findings
+## Work
+1. Add a `site_content` database record containing structured draft and published website content, seeded with the current visible copy. Keep anonymous access limited to published content and admin writes protected by the existing admin role.
+2. Add client-safe content helpers for reading published content, reading/saving admin drafts, publishing changes, and uploading/replacing page images in the existing private gallery bucket.
+3. Update the existing public components and routes to consume published content with the current hardcoded assets/copy as fallback, covering branding, hero, homepage sections, about, category introductions, contact details, footer, and legal pages.
+4. Extend `/admin` with a Site Content editor that groups fields by brand, homepage, about, galleries, contact, and legal pages. Include image previews/replacement, draft save, publish, and a preview link while preserving the existing gallery and account settings tools.
+5. Validate the route behavior, typecheck/build signals, and public/admin rendering without changing the existing public visual system.
 
-- The reset request reached the connected Lovable Cloud Auth backend: two `/recover` requests returned HTTP 200, including requests referred from the reset-password flow.
-- The reset request was entered for `anup2952@gmail.com`.
-- No managed email delivery event is visible for that recipient in the current seven-day retention window. This means there is no logged sent, rejected, bounced, suppressed, or rate-limited event to confirm delivery.
-- Lovable Cloud is healthy and responding normally.
-- No custom email domain is configured. Auth emails can fall back to the default sender, but the project has no configured branded sender domain for managed email delivery.
-
-## Diagnosis
-
-The form submission is working, but the available delivery logs do not show a successful send or a delivery failure for this request. The clearest configuration issue is that the project has not configured an owned email domain; inbox delivery therefore cannot be confirmed from the managed email event history.
-
-## Next step, only if requested
-
-Review the default auth-email sending status or set up an owned sender domain, then repeat one reset request and inspect its delivery event. No changes are included in this diagnosis.
+## Technical details
+- Use a JSONB content document so related page fields remain together and can evolve without repeated schema migrations.
+- Store image paths in the content document; resolve private storage images to signed URLs at read time.
+- Keep `site_content` RLS locked to published public reads and existing admin role checks for management.
+- Do not store passwords or add profile data; keep public signup disabled.

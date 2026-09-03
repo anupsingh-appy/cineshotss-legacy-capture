@@ -1,0 +1,4 @@
+- [ ] Add database-backed site content drafts and published versions with admin-only management.
+- [ ] Add content/media helpers and make public brand, pages, galleries, contact, footer, and legal copy use published content with safe fallbacks.
+- [ ] Add Site Content editor to /admin with image replacement, draft saving, publishing, and preview.
+- [ ] Validate public/admin behavior and confirm no build/runtime errors.
