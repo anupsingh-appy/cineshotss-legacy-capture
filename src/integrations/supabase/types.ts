@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      site_content: {
+        Row: {
+          created_at: string
+          draft_content: Json
+          id: string
+          published_at: string | null
+          published_content: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          draft_content?: Json
+          id: string
+          published_at?: string | null
+          published_content?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          draft_content?: Json
+          id?: string
+          published_at?: string | null
+          published_content?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
