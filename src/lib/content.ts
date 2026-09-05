@@ -250,7 +250,7 @@ function collectMediaPaths(value: unknown, result: string[] = []): string[] {
   return result;
 }
 
-async function addMediaUrls(content: SiteContent): Promise<SiteContentResult> {
+export async function resolveSiteContentMedia(content: SiteContent): Promise<SiteContentResult> {
   const paths = [...new Set(collectMediaPaths(content))];
   if (paths.length === 0) return { content, media: {} };
   const { data, error } = await supabase.storage.from(SITE_CONTENT_BUCKET).createSignedUrls(paths, 60 * 60);
@@ -267,7 +267,7 @@ export async function fetchPublishedSiteContent(): Promise<SiteContentResult> {
   try {
     const { data, error } = await supabase.from("site_content").select("published_content").eq("id", SITE_CONTENT_ID).maybeSingle();
     if (error) throw error;
-    return addMediaUrls(normalizeSiteContent(data?.published_content));
+    return resolveSiteContentMedia(normalizeSiteContent(data?.published_content));
   } catch {
     return { content: DEFAULT_SITE_CONTENT, media: {} };
   }
