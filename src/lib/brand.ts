@@ -19,3 +19,9 @@ export const whatsappUrl = (message = "Hi Cineshotss, I'd love to know more abou
 
 export const mailtoUrl = (subject = "Wedding enquiry") =>
   `mailto:${BRAND.email}?subject=${encodeURIComponent(subject)}`;
+
+export const whatsappUrlFor = (number: string, message = "Hi Cineshotss, I'd love to know more about your wedding coverage.") =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
+export const mailtoUrlFor = (email: string, subject = "Wedding enquiry") =>
+  `mailto:${email}?subject=${encodeURIComponent(subject)}`;

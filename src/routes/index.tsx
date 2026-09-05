@@ -3,7 +3,9 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
 import { EditorialSection } from "@/components/site/EditorialSection";
-import { BRAND, mailtoUrl, whatsappUrl } from "@/lib/brand";
+import { BRAND, mailtoUrlFor, whatsappUrlFor } from "@/lib/brand";
+import { useSiteContent } from "@/hooks/use-site-content";
+import { mediaUrl } from "@/lib/content";
 import heroImage from "@/assets/hero.jpg";
 import aboutImage from "@/assets/about.jpg";
 import wedding1 from "@/assets/wedding-1.jpg";
@@ -32,6 +34,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const contentResult = useSiteContent();
+  const { content } = contentResult;
+  const brand = content.brand;
+  const home = content.home;
+  const wedding = home.sections.wedding;
+  const preWedding = home.sections["pre-wedding"];
+  const engagement = home.sections.engagement;
+  const haldi = home.sections.haldi;
+
   return (
     <div className="min-h-screen">
       <SiteHeader overlay />
@@ -39,7 +50,7 @@ function Home() {
       {/* 1 — Hero */}
       <section className="relative flex h-[100svh] min-h-[560px] items-end overflow-hidden">
         <img
-          src={heroImage}
+          src={mediaUrl(contentResult, home.hero.imagePath, heroImage)}
           alt="Bride and groom photographed together in golden hour mist"
           width={1920}
           height={1088}
@@ -50,9 +61,9 @@ function Home() {
 
         <div className="relative z-10 w-full px-6 pb-24 md:px-12 md:pb-28">
           <div className="mx-auto max-w-[1600px] text-ondark">
-            <h1 className="display-xl uppercase tracking-[0.12em]">{BRAND.name}</h1>
+            <h1 className="display-xl uppercase tracking-[0.12em]">{home.hero.title || brand.name}</h1>
             <p className="mt-6 text-[0.75rem] uppercase tracking-[0.42em] text-ondark/85">
-              {BRAND.tagline}
+              {home.hero.tagline || brand.tagline}
             </p>
           </div>
         </div>
@@ -67,12 +78,12 @@ function Home() {
       <section id="about" className="px-6 py-20 md:px-12 md:py-32">
         <div className="mx-auto grid max-w-[1500px] gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24">
           <Reveal>
-            <p className="font-display text-3xl uppercase tracking-[0.3em]">{BRAND.name}</p>
+            <p className="font-display text-3xl uppercase tracking-[0.3em]">{brand.name}</p>
             <span className="mt-6 block h-px w-16 bg-champagne" />
-            <p className="body-editorial mt-6 max-w-xs">{BRAND.statement}</p>
+            <p className="body-editorial mt-6 max-w-xs">{brand.statement}</p>
             <figure className="mt-12 hidden overflow-hidden bg-muted lg:block">
               <img
-                src={aboutImage}
+                src={mediaUrl(contentResult, home.about.imagePath, aboutImage)}
                 alt="Bride portrait in soft window light"
                 width={1024}
                 height={1408}
@@ -84,24 +95,16 @@ function Home() {
           </Reveal>
 
           <Reveal delay={100}>
-            <h2 className="display-lg">About {BRAND.name}</h2>
+            <p className="eyebrow">{home.about.eyebrow}</p>
+            <h2 className="display-lg mt-5">{home.about.heading}</h2>
             <div className="mt-8 max-w-xl space-y-6">
-              <p className="body-editorial">
-                We photograph and film weddings the way they are actually lived — in glances,
-                in laughter, in the pause before a ritual begins. Nothing staged for the sake of a
-                photograph, everything shaped by the emotion already in the room.
-              </p>
-              <p className="body-editorial">
-                Our work moves between the intimate and the cinematic: the tremble of hands during
-                a ceremony, the scale of a celebration at dusk, the details you spent months
-                choosing. Photographs and films made to be revisited for decades.
-              </p>
+              {home.about.paragraphs.map((paragraph) => <p key={paragraph} className="body-editorial">{paragraph}</p>)}
             </div>
             <Link
               to="/contact"
               className="btn-outline-lux mt-12 text-foreground hover:bg-foreground hover:text-background"
             >
-              Get in Touch
+              {home.about.cta}
             </Link>
           </Reveal>
         </div>
@@ -109,15 +112,12 @@ function Home() {
 
       {/* 3 — Wedding */}
       <EditorialSection
-        eyebrow="Signature Coverage"
-        heading="Wedding"
+        eyebrow={wedding.eyebrow}
+        heading={wedding.heading}
         category="wedding"
-        cta="View Wedding Gallery"
-        paragraphs={[
-          "A full wedding day told as one story — the rituals, the portraits and every candid moment that happens between them.",
-          "We stay close to the emotion: parents watching, siblings laughing, the couple stealing a private second in the middle of a crowded room. Then we photograph the details you planned so carefully, so the day is remembered completely.",
-        ]}
-        notes={["Candid moments", "Emotions", "Couple portraits", "Family celebrations", "Rituals", "Details"]}
+        cta={wedding.cta}
+        paragraphs={wedding.paragraphs}
+        notes={wedding.notes}
         images={[
           { src: wedding1, alt: "Wedding ceremony garlands and falling petals", width: 1024, height: 1408 },
           { src: wedding2, alt: "Bridal bangles and mehndi detail", width: 1024, height: 1024 },
@@ -126,16 +126,13 @@ function Home() {
 
       {/* 4 — Pre-Wedding */}
       <EditorialSection
-        eyebrow="Before the Day"
-        heading="Pre-Wedding"
+        eyebrow={preWedding.eyebrow}
+        heading={preWedding.heading}
         category="pre-wedding"
-        cta="View Pre-Wedding Gallery"
+        cta={preWedding.cta}
         reverse
-        paragraphs={[
-          "A romantic, unhurried session built entirely around your chemistry — no rigid poses, no forced smiles.",
-          "We choose locations for their light and mood, then let you simply be together. Cinematic portraits, natural moments and the kind of easy warmth that only appears when nobody is performing.",
-        ]}
-        notes={["Genuine chemistry", "Beautiful locations", "Cinematic portraits", "Natural moments"]}
+        paragraphs={preWedding.paragraphs}
+        notes={preWedding.notes}
         images={[
           { src: preWedding1, alt: "Couple laughing on a coastal cliff at dusk", width: 1408, height: 1024 },
           { src: heroImage, alt: "Couple in golden hour mist", width: 1920, height: 1088 },
@@ -144,15 +141,12 @@ function Home() {
 
       {/* 5 — Engagement */}
       <EditorialSection
-        eyebrow="The First Celebration"
-        heading="Engagement"
+        eyebrow={engagement.eyebrow}
+        heading={engagement.heading}
         category="engagement"
-        cta="View Engagement Gallery"
-        paragraphs={[
-          "The evening it becomes official — rings, applause and a room full of people who have been waiting for this.",
-          "We photograph the intimacy and the excitement side by side: elegant portraits of the two of you, and the candid celebration unfolding around you.",
-        ]}
-        notes={["Celebration", "Intimacy", "Excitement", "Elegant portraits", "Candid moments"]}
+        cta={engagement.cta}
+        paragraphs={engagement.paragraphs}
+        notes={engagement.notes}
         images={[
           { src: engagement1, alt: "Ring exchange in candlelight", width: 1024, height: 1408 },
           { src: aboutImage, alt: "Portrait in soft window light", width: 1024, height: 1408 },
@@ -161,17 +155,14 @@ function Home() {
 
       {/* 6 — Haldi */}
       <EditorialSection
-        eyebrow="Tradition & Colour"
-        heading="Haldi Ceremony"
+        eyebrow={haldi.eyebrow}
+        heading={haldi.heading}
         category="haldi"
-        cta="View Haldi Gallery"
+        cta={haldi.cta}
         reverse
         warm
-        paragraphs={[
-          "The warmest, loudest, most joyful morning of the celebration — turmeric everywhere, marigolds underfoot, nobody staying clean.",
-          "We photograph haldi for what it truly is: family in the middle of the ritual, laughter that cannot be posed, colour and light at their most alive.",
-        ]}
-        notes={["Vibrant colours", "Laughter", "Family", "Traditions", "Candid moments", "Joyful celebration"]}
+        paragraphs={haldi.paragraphs}
+        notes={haldi.notes}
         images={[
           { src: haldi1, alt: "Turmeric applied to a laughing bride during haldi", width: 1408, height: 1024 },
           { src: wedding2, alt: "Marigold and bangle details on ivory fabric", width: 1024, height: 1024 },
@@ -193,65 +184,63 @@ function Home() {
         <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-28 text-ondark md:px-12 md:py-44">
           <Reveal>
             <h2 className="display-lg max-w-2xl">
-              Let us capture
-              <br />
-              your story…
+              {home.cta.heading}
             </h2>
             <p className="mt-8 text-[0.6875rem] uppercase tracking-[0.4em] text-ondark/70">
-              {BRAND.name}
+              {home.cta.eyebrow || brand.name}
             </p>
 
             <div className="mt-12 flex flex-wrap gap-4">
               <a
-                href={BRAND.instagramUrl}
+                href={brand.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-outline-lux text-ondark hover:bg-ondark hover:text-charcoal"
               >
-                Follow Us
+                {content.contact.instagramCta}
               </a>
               <a
-                href={whatsappUrl()}
+                href={whatsappUrlFor(brand.whatsappNumber)}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-outline-lux text-ondark hover:bg-ondark hover:text-charcoal"
               >
-                Connect on WhatsApp
+                {content.contact.whatsappCta}
               </a>
             </div>
 
             <dl className="mt-16 grid gap-8 border-t border-ondark/20 pt-8 sm:grid-cols-3">
               <div>
-                <dt className="eyebrow text-ondark/60">Email</dt>
+                <dt className="eyebrow text-ondark/60">{content.contact.emailLabel}</dt>
                 <dd className="mt-2">
-                  <a href={mailtoUrl()} className="text-sm transition-opacity hover:opacity-70">
-                    {BRAND.email}
+                    <a href={mailtoUrlFor(brand.email)} className="text-sm transition-opacity hover:opacity-70">
+                     {brand.email}
                   </a>
                 </dd>
               </div>
               <div>
-                <dt className="eyebrow text-ondark/60">Instagram</dt>
+                <dt className="eyebrow text-ondark/60">{content.contact.instagramLabel}</dt>
                 <dd className="mt-2">
                   <a
-                    href={BRAND.instagramUrl}
+                      href={brand.instagramUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm transition-opacity hover:opacity-70"
                   >
-                    {BRAND.instagramHandle}
+                      {brand.instagramHandle}
                   </a>
                 </dd>
               </div>
               <div>
-                <dt className="eyebrow text-ondark/60">WhatsApp</dt>
+                <dt className="eyebrow text-ondark/60">{content.contact.whatsappLabel}</dt>
                 <dd className="mt-2">
                   <a
-                    href={whatsappUrl()}
+                    href={whatsappUrlFor(brand.whatsappNumber)}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm transition-opacity hover:opacity-70"
                   >
-                    {BRAND.whatsappDisplay}
+                    {brand.whatsappDisplay}
                   </a>
                 </dd>
               </div>

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";
+import { useSiteContent } from "@/hooks/use-site-content";
 
 const NAV = [
   { label: "Wedding", to: "/gallery/$category", params: { category: "wedding" } },
@@ -17,6 +18,9 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ overlay = false }: SiteHeaderProps) {
+  const { content } = useSiteContent();
+  const brand = content.brand;
+  const labels = content.navigation;
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -49,7 +53,7 @@ export function SiteHeader({ overlay = false }: SiteHeaderProps) {
           className="font-display text-xl tracking-[0.34em] uppercase md:text-2xl"
           onClick={() => setOpen(false)}
         >
-          {BRAND.name}
+          {brand.name}
         </Link>
 
         <nav className="hidden items-center gap-9 lg:flex">
@@ -61,7 +65,7 @@ export function SiteHeader({ overlay = false }: SiteHeaderProps) {
               className="text-[0.6875rem] uppercase tracking-[0.24em] opacity-75 transition-opacity hover:opacity-100"
               activeProps={{ className: "opacity-100" }}
             >
-              {item.label}
+              {labels[item.label === "Pre-Wedding" ? "preWedding" : item.label.toLowerCase()] ?? item.label}
             </Link>
           ))}
         </nav>
@@ -104,10 +108,10 @@ export function SiteHeader({ overlay = false }: SiteHeaderProps) {
               className="font-display border-b border-border py-4 text-3xl text-foreground"
               style={{ transitionDelay: `${index * 40}ms` }}
             >
-              {item.label}
+              {labels[item.label === "Pre-Wedding" ? "preWedding" : item.label.toLowerCase()] ?? item.label}
             </Link>
           ))}
-          <p className="eyebrow mt-10">{BRAND.statement}</p>
+          <p className="eyebrow mt-10">{brand.statement}</p>
         </nav>
       </div>
     </header>
