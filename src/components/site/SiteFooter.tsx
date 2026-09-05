@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { BRAND, mailtoUrl, whatsappUrl } from "@/lib/brand";
 import { CATEGORIES } from "@/lib/gallery";
 import { useSiteContent } from "@/hooks/use-site-content";
 import { whatsappUrlFor, mailtoUrlFor } from "@/lib/brand";
