@@ -3,6 +3,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Reveal } from "@/components/site/Reveal";
 import { BRAND } from "@/lib/brand";
+import { useSiteContent } from "@/hooks/use-site-content";
+import { mediaUrl } from "@/lib/content";
 import aboutImage from "@/assets/about.jpg";
 
 const title = `About ${BRAND.name} | Wedding Photography & Films`;
@@ -24,6 +26,9 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const contentResult = useSiteContent();
+  const { content } = contentResult;
+  const about = content.about;
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -32,7 +37,7 @@ function AboutPage() {
           <Reveal>
             <figure className="overflow-hidden bg-muted">
               <img
-                src={aboutImage}
+                src={mediaUrl(contentResult, about.imagePath, aboutImage)}
                 alt="Bride portrait photographed in soft window light"
                 width={1024}
                 height={1408}
@@ -44,34 +49,14 @@ function AboutPage() {
           </Reveal>
 
           <Reveal delay={100}>
-            <p className="eyebrow">About</p>
-            <h1 className="display-lg mt-5">About {BRAND.name}</h1>
+            <p className="eyebrow">{about.eyebrow}</p>
+            <h1 className="display-lg mt-5">{about.heading}</h1>
             <div className="mt-8 space-y-6">
-              <p className="body-editorial">
-                {BRAND.name} is a wedding photography and cinematography studio built around a
-                simple belief: the moments worth keeping are rarely the posed ones. We photograph
-                the glance before the vows, the grandmother who cannot stop crying, the cousins
-                dancing before the music has properly started.
-              </p>
-              <p className="body-editorial">
-                Our approach is unobtrusive and editorial. We work quietly through the day —
-                following light, ritual and emotion — then shape what we gather into photographs
-                and films that feel like memory rather than documentation.
-              </p>
-              <p className="body-editorial">
-                From intimate ceremonies to multi-day celebrations, every collection is treated as
-                one continuous story: the details, the portraits, the traditions and the
-                celebration that surrounds them.
-              </p>
+              {about.paragraphs.map((paragraph) => <p key={paragraph} className="body-editorial">{paragraph}</p>)}
             </div>
 
             <dl className="mt-12 grid gap-8 sm:grid-cols-2">
-              {[
-                ["Photography", "Wedding, pre-wedding, engagement and haldi coverage."],
-                ["Cinematography", "Wedding films cut for emotion, not checklists."],
-                ["Direction", "Gentle guidance so portraits still feel like you."],
-                ["Delivery", "Carefully curated, colour-graded galleries and films."],
-              ].map(([term, detail]) => (
+              {about.services.map(({ term, detail }) => (
                 <div key={term} className="border-t border-border pt-4">
                   <dt className="eyebrow">{term}</dt>
                   <dd className="body-editorial mt-2">{detail}</dd>
@@ -83,7 +68,7 @@ function AboutPage() {
               to="/contact"
               className="btn-outline-lux mt-12 text-foreground hover:bg-foreground hover:text-background"
             >
-              Get in Touch
+              {about.cta}
             </Link>
           </Reveal>
         </div>

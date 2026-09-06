@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { validateGalleryFile } from "@/lib/gallery";
+import type { Json } from "@/integrations/supabase/types";
 
 export const SITE_CONTENT_ID = "main";
 export const SITE_CONTENT_BUCKET = "gallery";
@@ -285,12 +286,12 @@ export async function fetchSiteContentForAdmin() {
 }
 
 export async function saveSiteContentDraft(content: SiteContent) {
-  const { error } = await supabase.from("site_content").update({ draft_content: content }).eq("id", SITE_CONTENT_ID);
+  const { error } = await supabase.from("site_content").update({ draft_content: content as unknown as Json }).eq("id", SITE_CONTENT_ID);
   if (error) throw error;
 }
 
 export async function publishSiteContent(content: SiteContent) {
-  const { error } = await supabase.from("site_content").update({ draft_content: content, published_content: content, published_at: new Date().toISOString() }).eq("id", SITE_CONTENT_ID);
+  const { error } = await supabase.from("site_content").update({ draft_content: content as unknown as Json, published_content: content as unknown as Json, published_at: new Date().toISOString() }).eq("id", SITE_CONTENT_ID);
   if (error) throw error;
 }
 

@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Reveal } from "@/components/site/Reveal";
-import { BRAND, mailtoUrl, whatsappUrl } from "@/lib/brand";
+import { BRAND, mailtoUrlFor, whatsappUrlFor } from "@/lib/brand";
+import { useSiteContent } from "@/hooks/use-site-content";
+import { mediaUrl } from "@/lib/content";
 import ctaImage from "@/assets/cta.jpg";
 
 const title = `Contact ${BRAND.name} | Wedding Photography Enquiries`;
@@ -24,57 +26,58 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const contentResult = useSiteContent();
+  const { content } = contentResult;
+  const brand = content.brand;
+  const contact = content.contact;
   return (
     <div className="min-h-screen">
       <SiteHeader />
       <main className="px-6 pt-32 pb-20 md:px-12 md:pt-44 md:pb-28">
         <div className="mx-auto max-w-[1500px]">
           <Reveal className="max-w-2xl">
-            <p className="eyebrow">Contact</p>
-            <h1 className="display-lg mt-5">Let's talk about your dates</h1>
-            <p className="body-editorial mt-6">
-              Tell us where you're celebrating, the dates you're holding and what matters most to
-              you. We'll reply with availability, coverage options and a selection of recent work.
-            </p>
+            <p className="eyebrow">{contact.eyebrow}</p>
+            <h1 className="display-lg mt-5">{contact.heading}</h1>
+            <p className="body-editorial mt-6">{contact.description}</p>
           </Reveal>
 
           <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-20">
             <Reveal>
               <dl className="space-y-10">
                 <div className="border-t border-border pt-5">
-                  <dt className="eyebrow">WhatsApp</dt>
+                  <dt className="eyebrow">{contact.whatsappLabel}</dt>
                   <dd className="mt-3">
                     <a
-                      href={whatsappUrl()}
+                      href={whatsappUrlFor(brand.whatsappNumber)}
                       target="_blank"
                       rel="noreferrer"
                       className="font-display text-2xl transition-opacity hover:opacity-70"
                     >
-                      {BRAND.whatsappDisplay}
+                      {brand.whatsappDisplay}
                     </a>
                   </dd>
                 </div>
                 <div className="border-t border-border pt-5">
-                  <dt className="eyebrow">Email</dt>
+                  <dt className="eyebrow">{contact.emailLabel}</dt>
                   <dd className="mt-3">
                     <a
-                      href={mailtoUrl()}
+                      href={mailtoUrlFor(brand.email)}
                       className="font-display text-2xl transition-opacity hover:opacity-70"
                     >
-                      {BRAND.email}
+                      {brand.email}
                     </a>
                   </dd>
                 </div>
                 <div className="border-t border-border pt-5">
-                  <dt className="eyebrow">Instagram</dt>
+                  <dt className="eyebrow">{contact.instagramLabel}</dt>
                   <dd className="mt-3">
                     <a
-                      href={BRAND.instagramUrl}
+                      href={brand.instagramUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="font-display text-2xl transition-opacity hover:opacity-70"
                     >
-                      {BRAND.instagramHandle}
+                      {brand.instagramHandle}
                     </a>
                   </dd>
                 </div>
@@ -82,20 +85,20 @@ function ContactPage() {
 
               <div className="mt-12 flex flex-wrap gap-4">
                 <a
-                  href={whatsappUrl()}
+                  href={whatsappUrlFor(brand.whatsappNumber)}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-solid-lux"
                 >
-                  Connect on WhatsApp
+                  {contact.whatsappCta}
                 </a>
                 <a
-                  href={BRAND.instagramUrl}
+                  href={brand.instagramUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-outline-lux text-foreground hover:bg-foreground hover:text-background"
                 >
-                  Follow Us
+                  {contact.instagramCta}
                 </a>
               </div>
             </Reveal>
@@ -103,7 +106,7 @@ function ContactPage() {
             <Reveal delay={120}>
               <figure className="overflow-hidden bg-charcoal">
                 <img
-                  src={ctaImage}
+                  src={mediaUrl(contentResult, contact.imagePath, ctaImage)}
                   alt="Couple photographed at night against city lights"
                   width={1920}
                   height={1088}

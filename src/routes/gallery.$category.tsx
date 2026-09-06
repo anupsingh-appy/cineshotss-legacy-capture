@@ -4,6 +4,7 @@ import { GalleryGrid } from "@/components/gallery/GalleryGrid";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BRAND, whatsappUrl } from "@/lib/brand";
+import { useSiteContent } from "@/hooks/use-site-content";
 import {
   CATEGORIES,
   categoryLabel,
@@ -50,6 +51,8 @@ function GalleryPage() {
   const { category } = Route.useParams();
   const slug = category as CategorySlug;
   const label = categoryLabel(slug);
+  const { content } = useSiteContent();
+  const galleryCopy = content.galleries[slug];
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["gallery", slug],
@@ -63,8 +66,8 @@ function GalleryPage() {
         <div className="mx-auto max-w-[1500px]">
           <header className="max-w-2xl">
             <p className="eyebrow">Gallery</p>
-            <h1 className="display-lg mt-5">{label}</h1>
-            <p className="body-editorial mt-6">{COPY[slug]}</p>
+            <h1 className="display-lg mt-5">{galleryCopy?.label ?? label}</h1>
+            <p className="body-editorial mt-6">{galleryCopy?.description ?? COPY[slug]}</p>
           </header>
 
           <nav className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-y border-border py-5">

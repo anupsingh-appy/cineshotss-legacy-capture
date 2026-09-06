@@ -38,10 +38,10 @@ function Home() {
   const { content } = contentResult;
   const brand = content.brand;
   const home = content.home;
-  const wedding = home.sections.wedding;
+  const wedding = home.sections["wedding"] ?? home.sections["haldi"];
   const preWedding = home.sections["pre-wedding"];
-  const engagement = home.sections.engagement;
-  const haldi = home.sections.haldi;
+  const engagement = home.sections["engagement"] ?? home.sections["haldi"];
+  const haldi = home.sections["haldi"] ?? home.sections["wedding"];
 
   return (
     <div className="min-h-screen">
