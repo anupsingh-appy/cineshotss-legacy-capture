@@ -21,6 +21,7 @@ import {
   type GalleryPhoto,
 } from "@/lib/gallery";
 import { isAdmin, reauthenticateWithPassword, signOut, useAuth } from "@/lib/auth";
+import { SiteContentEditor } from "@/components/admin/SiteContentEditor";
 
 export const Route = createFileRoute("/admin/")({
   ssr: false,
@@ -345,6 +346,10 @@ function AdminDashboardPage() {
             ))}
           </div>
         </div>
+
+        <section id="site-content" className="scroll-mt-8 border-b border-border py-12" aria-labelledby="site-content-heading">
+          <SiteContentEditor />
+        </section>
 
         <section id="account-settings" className="scroll-mt-8 border-b border-border py-12" aria-labelledby="account-settings-heading">
           <div className="max-w-2xl">
