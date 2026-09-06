@@ -17,7 +17,7 @@ export function SiteFooter() {
           </div>
 
           <nav className="flex flex-col gap-3">
-            <p className="eyebrow mb-2">{labels.galleries ?? "Galleries"}</p>
+            <p className="eyebrow mb-2">{labels["galleries"] ?? "Galleries"}</p>
             {CATEGORIES.map((c) => (
               <Link
                 key={c.slug}
@@ -29,15 +29,15 @@ export function SiteFooter() {
               </Link>
             ))}
             <Link to="/about" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              {labels.about ?? "About"}
+              {labels["about"] ?? "About"}
             </Link>
             <Link to="/contact" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              {labels.contact ?? "Contact"}
+              {labels["contact"] ?? "Contact"}
             </Link>
           </nav>
 
           <div className="flex flex-col gap-3">
-            <p className="eyebrow mb-2">{labels.connect ?? "Connect"}</p>
+            <p className="eyebrow mb-2">{labels["connect"] ?? "Connect"}</p>
             <a
               href={brand.instagramUrl}
               target="_blank"
@@ -69,10 +69,10 @@ export function SiteFooter() {
           </p>
           <div className="flex gap-6">
             <Link to="/privacy" className="transition-colors hover:text-foreground">
-              {labels.privacy ?? "Privacy Policy"}
+              {labels["privacy"] ?? "Privacy Policy"}
             </Link>
             <Link to="/terms" className="transition-colors hover:text-foreground">
-              {labels.terms ?? "Terms & Support"}
+              {labels["terms"] ?? "Terms & Support"}
             </Link>
           </div>
         </div>

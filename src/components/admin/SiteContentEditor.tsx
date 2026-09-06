@@ -170,7 +170,7 @@ export function SiteContentEditor({ onPublished }: SiteContentEditorProps) {
           <Field label="Introduction button" value={content.home.about.cta} onChange={(value) => setValue(["home", "about", "cta"], value)} />
         </div>
         {CATEGORIES.map((category) => {
-          const section = content.home.sections[category.slug];
+          const section = content.home.sections[category.slug] ?? content.home.sections["wedding"];
           return <div key={category.slug} className="space-y-5 border-t border-border pt-8">
             <h4 className="font-display text-xl">{category.label} section</h4>
             <div className="grid gap-5 md:grid-cols-2">
@@ -211,8 +211,8 @@ export function SiteContentEditor({ onPublished }: SiteContentEditorProps) {
         <div className="grid gap-5 md:grid-cols-2">
           {CATEGORIES.map((category) => <div key={category.slug} className="space-y-5 border-t border-border pt-5">
             <h4 className="font-display text-xl">{category.label}</h4>
-            <Field label="Label" value={content.galleries[category.slug].label} onChange={(value) => setValue(["galleries", category.slug, "label"], value)} />
-            <Field label="Description" value={content.galleries[category.slug].description} onChange={(value) => setValue(["galleries", category.slug, "description"], value)} multiline />
+            <Field label="Label" value={(content.galleries[category.slug] ?? { label: category.label, description: "" }).label} onChange={(value) => setValue(["galleries", category.slug, "label"], value)} />
+            <Field label="Description" value={(content.galleries[category.slug] ?? { label: category.label, description: "" }).description} onChange={(value) => setValue(["galleries", category.slug, "description"], value)} multiline />
           </div>)}
         </div>
       </section>
