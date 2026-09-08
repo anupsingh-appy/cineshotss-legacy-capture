@@ -12,7 +12,7 @@ export function useSiteContent(): SiteContentResult {
     queryKey: siteContentQueryKey,
     queryFn: fetchPublishedSiteContent,
     initialData: { content: DEFAULT_SITE_CONTENT, media: {} },
-    staleTime: 60_000,
+    staleTime: 0,
   });
 
   return data ?? { content: DEFAULT_SITE_CONTENT, media: {} };

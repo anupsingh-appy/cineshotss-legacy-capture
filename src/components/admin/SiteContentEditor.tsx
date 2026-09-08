@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
   type SiteContent,
   type SiteContentResult,
 } from "@/lib/content";
+import { siteContentQueryKey } from "@/hooks/use-site-content";
 import { CATEGORIES, type CategorySlug } from "@/lib/gallery";
 
 interface SiteContentEditorProps {
@@ -77,6 +79,7 @@ function ImageField({ label, path, fallback, media, onChange }: { label: string;
 }
 
 export function SiteContentEditor({ onPublished }: SiteContentEditorProps) {
+  const queryClient = useQueryClient();
   const [content, setContent] = useState<SiteContent | null>(null);
   const [published, setPublished] = useState<SiteContent | null>(null);
   const [media, setMedia] = useState<SiteContentResult | null>(null);
@@ -111,6 +114,7 @@ export function SiteContentEditor({ onPublished }: SiteContentEditorProps) {
       if (publish) {
         await publishSiteContent(content);
         setPublished(content);
+        await queryClient.invalidateQueries({ queryKey: siteContentQueryKey });
         onPublished?.();
         toast.success("Website content published");
       } else {
