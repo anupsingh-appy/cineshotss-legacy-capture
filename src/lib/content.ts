@@ -286,13 +286,29 @@ export async function fetchSiteContentForAdmin() {
 }
 
 export async function saveSiteContentDraft(content: SiteContent) {
-  const { error } = await supabase.from("site_content").update({ draft_content: content as unknown as Json }).eq("id", SITE_CONTENT_ID);
+  const { data, error } = await supabase
+    .from("site_content")
+    .update({ draft_content: content as unknown as Json })
+    .eq("id", SITE_CONTENT_ID)
+    .select("id")
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new Error("Website content record is missing.");
 }
 
 export async function publishSiteContent(content: SiteContent) {
-  const { error } = await supabase.from("site_content").update({ draft_content: content as unknown as Json, published_content: content as unknown as Json, published_at: new Date().toISOString() }).eq("id", SITE_CONTENT_ID);
+  const { data, error } = await supabase
+    .from("site_content")
+    .update({
+      draft_content: content as unknown as Json,
+      published_content: content as unknown as Json,
+      published_at: new Date().toISOString(),
+    })
+    .eq("id", SITE_CONTENT_ID)
+    .select("id")
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new Error("Website content record is missing.");
 }
 
 export async function uploadSiteContentImage(file: File, field: string) {
