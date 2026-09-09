@@ -16,7 +16,7 @@ interface EditorialSectionProps {
   notes: string[];
   cta: string;
   category: CategorySlug;
-  images: [EditorialImage, EditorialImage];
+  images: [EditorialImage, EditorialImage, EditorialImage];
   /** Flip the text/image order for editorial rhythm. */
   reverse?: boolean;
   /** Warm haldi tint on the section surface. */
@@ -34,7 +34,7 @@ export function EditorialSection({
   reverse = false,
   warm = false,
 }: EditorialSectionProps) {
-  const [lead, support] = images;
+  const [lead, medium, small] = images;
 
   return (
     <section
@@ -71,8 +71,8 @@ export function EditorialSection({
         </Reveal>
 
         <Reveal className={reverse ? "lg:order-1" : ""} delay={120}>
-          <div className="grid grid-cols-5 grid-rows-6 gap-3 sm:gap-5">
-            <figure className="col-span-4 row-span-6 overflow-hidden bg-muted">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:gap-5">
+            <figure className="group overflow-hidden bg-muted sm:col-span-7 sm:row-span-2">
               <img
                 src={lead.src}
                 alt={lead.alt}
@@ -80,18 +80,29 @@ export function EditorialSection({
                 height={lead.height}
                 loading="lazy"
                 decoding="async"
-                className="img-cinematic h-full w-full object-cover"
+                className="img-cinematic aspect-[4/5] h-full w-full object-cover"
               />
             </figure>
-            <figure className="col-span-3 col-start-3 row-span-3 row-start-4 self-end overflow-hidden bg-muted shadow-[0_24px_60px_-30px_oklch(0.229_0.008_70/0.45)]">
+            <figure className="group overflow-hidden bg-muted sm:col-span-5">
               <img
-                src={support.src}
-                alt={support.alt}
-                width={support.width}
-                height={support.height}
+                src={medium.src}
+                alt={medium.alt}
+                width={medium.width}
+                height={medium.height}
                 loading="lazy"
                 decoding="async"
-                className="img-cinematic h-full w-full object-cover"
+                className="img-cinematic aspect-[4/3] h-full w-full object-cover"
+              />
+            </figure>
+            <figure className="group overflow-hidden bg-muted sm:col-span-5">
+              <img
+                src={small.src}
+                alt={small.alt}
+                width={small.width}
+                height={small.height}
+                loading="lazy"
+                decoding="async"
+                className="img-cinematic aspect-[16/10] h-full w-full object-cover"
               />
             </figure>
           </div>

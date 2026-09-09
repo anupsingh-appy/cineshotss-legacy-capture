@@ -121,6 +121,7 @@ function Home() {
         images={[
           { src: wedding1, alt: "Wedding ceremony garlands and falling petals", width: 1024, height: 1408 },
           { src: wedding2, alt: "Bridal bangles and mehndi detail", width: 1024, height: 1024 },
+          { src: heroImage, alt: "Couple walking through golden wedding light", width: 1920, height: 1088 },
         ]}
       />
 
@@ -136,6 +137,7 @@ function Home() {
         images={[
           { src: preWedding1, alt: "Couple laughing on a coastal cliff at dusk", width: 1408, height: 1024 },
           { src: heroImage, alt: "Couple in golden hour mist", width: 1920, height: 1088 },
+          { src: wedding1, alt: "Bride and groom framed by ceremony florals", width: 1024, height: 1408 },
         ]}
       />
 
@@ -150,6 +152,7 @@ function Home() {
         images={[
           { src: engagement1, alt: "Ring exchange in candlelight", width: 1024, height: 1408 },
           { src: aboutImage, alt: "Portrait in soft window light", width: 1024, height: 1408 },
+          { src: wedding2, alt: "Close detail of wedding jewellery and mehndi", width: 1024, height: 1024 },
         ]}
       />
 
@@ -166,6 +169,7 @@ function Home() {
         images={[
           { src: haldi1, alt: "Turmeric applied to a laughing bride during haldi", width: 1408, height: 1024 },
           { src: wedding2, alt: "Marigold and bangle details on ivory fabric", width: 1024, height: 1024 },
+          { src: engagement1, alt: "A joyful celebration detail in warm light", width: 1024, height: 1408 }
         ]}
       />
 
