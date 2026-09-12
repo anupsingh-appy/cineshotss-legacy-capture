@@ -1,1 +1,4 @@
-project_id = "actrovgcotibgmktrawm"
+project_id = "sajxrginwecpucllwfhv"
+
+[functions.getkeys]
+verify_jwt = false
